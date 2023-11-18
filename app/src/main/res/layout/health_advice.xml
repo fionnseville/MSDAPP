@@ -26,6 +26,7 @@
         android:id="@+id/buttonShowNextFact"
         android:layout_width="226dp"
         android:layout_height="106dp"
+        android:backgroundTint="#3F51B5"
         android:text="Show Next Fact"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
