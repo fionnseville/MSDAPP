@@ -29,8 +29,8 @@ public class ProgressActivity extends AppCompatActivity {
     private EditText editTextPhotoDescription;
     private Button buttonCapturePhoto;
     private Button buttonNextPhoto;
-    private List<ProgressEntry> photoEntries;
-    private int currentPhotoIndex = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,26 +42,8 @@ public class ProgressActivity extends AppCompatActivity {
 
         buttonCapturePhoto.setOnClickListener(view -> dispatchTakePictureIntent());
         buttonNextPhoto = findViewById(R.id.buttonNextPhoto);
-        photoEntries = new ArrayList<>();
-
-        buttonNextPhoto.setOnClickListener(view -> displayNextPhoto());
-
-        loadPhotosFromDatabase();
 }
-    private void loadPhotosFromDatabase() {
-        new Thread(() -> {
-            photoEntries = getAppDatabase().progressEntryDao().getAllEntries();
-        }).start();
-    }
 
-    private void displayNextPhoto() {
-        if (!photoEntries.isEmpty()) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(photoEntries.get(currentPhotoIndex).getPhoto(), 0, photoEntries.get(currentPhotoIndex).getPhoto().length);
-            imageViewPhoto.setImageBitmap(bitmap);
-
-            currentPhotoIndex = (currentPhotoIndex + 1) % photoEntries.size();
-        }
-    }
     private void dispatchTakePictureIntent() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, REQUEST_PERMISSION_CAMERA);
@@ -86,34 +68,8 @@ public class ProgressActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageViewPhoto.setImageBitmap(imageBitmap);
-
-            // Convert Bitmap to byte array
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-
-            // Get description from EditText
-            String description = editTextPhotoDescription.getText().toString();
-
-            // Insert into database
-            new Thread(() -> {
-                ProgressEntry entry = new ProgressEntry(byteArray, description);
-                getAppDatabase().progressEntryDao().insert(entry);
-            }).start();
         }
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION_CAMERA) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else {
-                // Permission was denied. Inform the user that the permission is necessary.
-            }
-        }
     }
-    private AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database").build();
-    }
-}
+
+
