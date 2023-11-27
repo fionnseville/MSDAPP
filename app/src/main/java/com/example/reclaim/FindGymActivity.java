@@ -55,11 +55,12 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         mLocationText = (TextView) findViewById(R.id.location);   // initialises the text view using its id from xml
         locality = (TextView) findViewById(R.id.locality);// initialises locality with a text view from xml
         locationsListView = (ListView) findViewById(R.id.locations_list);
-        locationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationsList);
+        //locationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationsList);
+        //locationsListView.setAdapter(locationsAdapter);
+        locationsAdapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.textViewItem, locationsList);
         locationsListView.setAdapter(locationsAdapter);
         setUpLocation();
-        Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
-
+        //Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
         map=findViewById(R.id.map);
 
         SupportMapFragment mapFragment =( SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -84,7 +85,18 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
 
     @Override
     public void onLocationChanged(Location location) {
-        String latestLocation = "";
+        String latestLocation = String.format(
+                "Current Location: Latitude %1$s, Longitude %2$s",
+                location.getLatitude(), location.getLongitude());
+        mLocationText.setText("GPS Location\n" + latestLocation);
+
+        if (gMap != null) {
+            LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            gMap.clear(); // Clear old markers
+            gMap.addMarker(new MarkerOptions().position(currentLocation).title("Current Location"));
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15)); // Zoom level is adjustable
+        }
+        //String latestLocation = "";
 
         Log.d("GPSLOCATION", "LOCATION CHANGED!"); // logs message when location is changed
 
@@ -97,7 +109,11 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         mLocationText.setText("GPS Location" + "\n" + latestLocation);  // updates the TextView with new location
 
         fetchNearbyGyms(location.getLatitude(), location.getLongitude());
+        updateAddress(location);
 
+
+    }
+    private void updateAddress(Location location) {
         try {
             Geocoder geo = new Geocoder(FindGymActivity.this.getApplicationContext(), Locale.getDefault());   // Geocoder for translating longitude and latitude into human-readable address
             List<Address> addresses = geo.getFromLocation(location.getLatitude(), location.getLongitude(), 1); // Creates list of addresses from current location
@@ -114,6 +130,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
             e.printStackTrace();
         }
     }
+
     private void fetchNearbyGyms(double latitude, double longitude) {
         // Placeholder for fetching nearby gyms
         locationsList.clear();
