@@ -14,18 +14,28 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class FindGymActivity extends AppCompatActivity implements LocationListener {
+public class FindGymActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
 
     private TextView mLocationText;   // displays current gps location details
     private TextView locality;         // shows the address found
@@ -36,6 +46,8 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     private ListView locationsListView;
     private ArrayAdapter<String> locationsAdapter;
     private ArrayList<String> locationsList = new ArrayList<>();
+    GoogleMap gMap;
+    FrameLayout map;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +60,10 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         setUpLocation();
         Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
 
+        map=findViewById(R.id.map);
 
+        SupportMapFragment mapFragment =( SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void setUpLocation()
@@ -113,7 +128,6 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         switch (requestCode) {
             case MY_PERMISSION_GPS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // All good!
                 } else {
                     Toast.makeText(this, "Need your location!", Toast.LENGTH_SHORT).show();
                 }
@@ -157,5 +171,13 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     }
 
 
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
 
+        this.gMap =googleMap;
+        LatLng mapIreland =new LatLng(53,-6);
+        this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
+        this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
+    }
 }
+
