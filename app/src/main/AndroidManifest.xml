@@ -5,6 +5,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -37,7 +38,9 @@
             android:exported="true"/>
         <activity android:name=".ProgressActivity"
             android:exported="true"/>
-
+        <activity android:name=".ViewProgressActivity"/>
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBNdzUiEVlNllle5p7fbIMfqNMVq6K_xJI"/>
 
     </application>
 

@@ -3,6 +3,9 @@ package com.example.reclaim;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
+
+import java.util.Date;
+
 @Entity(tableName = "progress_entries")
 public class ProgressEntry {
     @PrimaryKey(autoGenerate = true)
@@ -14,13 +17,13 @@ public class ProgressEntry {
     @ColumnInfo(name = "description")
     public String description;
 
-    // Constructor, getters, and setters
-    public ProgressEntry(byte[] photo, String description) {
+    @ColumnInfo(name = "date")
+    public Date date;
+    public ProgressEntry(byte[] photo, String description, Date date) {
         this.photo = photo;
         this.description = description;
+        this.date = date;
     }
-
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -44,4 +47,14 @@ public class ProgressEntry {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 }
+
+

@@ -35,6 +35,7 @@
         android:id="@+id/buttonCapturePhoto"
         android:layout_width="337dp"
         android:layout_height="72dp"
+        android:backgroundTint="#3F51B5"
         android:text="Capture Photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,14 +45,26 @@
 
     <Button
         android:id="@+id/buttonNextPhoto"
-        android:layout_width="145dp"
-        android:layout_height="73dp"
-        android:text="Next Photo"
+        android:layout_width="337dp"
+        android:layout_height="68dp"
+        android:backgroundTint="#3F51B5"
+        android:text="View All Entries"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.86"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.843" />
+        app:layout_constraintVertical_bias="0.873" />
+
+    <Button
+        android:id="@+id/buttonSubmit"
+        android:layout_width="337dp"
+        android:layout_height="68dp"
+        android:backgroundTint="#3F51B5"
+        android:text="Submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.743" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

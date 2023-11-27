@@ -12,3 +12,4 @@ public interface ProgressEntryDao {
     @Query("SELECT * FROM progress_entries")
     List<ProgressEntry> getAllEntries();
 }
+
