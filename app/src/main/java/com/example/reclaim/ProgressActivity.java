@@ -67,13 +67,13 @@ public class ProgressActivity extends AppCompatActivity {
         // Check if the description is empty
         if (description.isEmpty()) {
             Toast.makeText(this, "Please include a description", Toast.LENGTH_SHORT).show();
-            return; // Exit the method if description is empty
+            return;
         }
 
         // Check if the currentPhoto is null
         if (currentPhoto == null) {
             Toast.makeText(this, "Please capture a photo", Toast.LENGTH_SHORT).show();
-            return; // Exit the method if the photo is null
+            return;
         }
 
         // Save the entry to the database

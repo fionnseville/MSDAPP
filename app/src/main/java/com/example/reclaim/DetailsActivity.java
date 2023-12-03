@@ -12,13 +12,18 @@ import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
+import java.util.Date;
 import java.util.Locale;
 
 public class DetailsActivity extends AppCompatActivity {
-    EditText editTextWeight, editTextHeight;
+    EditText editTextWeight, editTextHeight,nameview,ageview,emailview,phoneview;
     TextView textViewBmiResult;
     Button bmiButton;
+    Button viewDetailsButton;
+    Button Submit;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,24 +31,23 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.details_activity);
 
         Button returnbutton=findViewById(R.id.returnbutton);
-        Button viewdetailsbutton=findViewById(R.id.viewdetailsbutton);
-        findViewById(R.id.returnbutton).setOnClickListener(view -> {
+        returnbutton.setOnClickListener(view -> {
             Intent intent = new Intent(DetailsActivity.this, SecondActivity.class);
             startActivity(intent);
         });
-        findViewById(R.id.viewdetailsbutton).setOnClickListener(view -> {
-            Intent intent = new Intent(DetailsActivity.this, SecondActivity.class);
-            startActivity(intent);
-        });
-        findViewById(R.id.buttonSubmit).setOnClickListener(view -> {
-            Intent intent = new Intent(DetailsActivity.this, SecondActivity.class);
-            startActivity(intent);
-        });
+
+        Submit =findViewById(R.id.buttonSubmit);
+        Submit.setOnClickListener(view -> submitUserDetails());
         editTextWeight = findViewById(R.id.weightview);
         editTextHeight = findViewById(R.id.heightview);
         textViewBmiResult = findViewById(R.id.bmireturn);
         bmiButton = findViewById(R.id.bmibutton);
-
+        viewDetailsButton = findViewById(R.id.viewdetailsbutton);
+        viewDetailsButton.setOnClickListener(view -> {
+            Intent intent = new Intent(DetailsActivity.this, ViewDetailsActivity.class);
+            startActivity(intent);
+        });
+        //viewDetailsButton.setOnClickListener(view -> loadAndDisplayUserDetails(1));
         bmiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,14 +55,58 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void calculateAndDisplayBMI() {
+    private void submitUserDetails() {
         String weightStr = editTextWeight.getText().toString();
         String heightStr = editTextHeight.getText().toString();
 
         if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
             float weight = Float.parseFloat(weightStr);
-            float height = Float.parseFloat(heightStr) / 100; // Convert cm to meters
+            float height = Float.parseFloat(heightStr);
+            nameview = findViewById(R.id.Nameview);
+            ageview = findViewById(R.id.ageview);
+            emailview = findViewById(R.id.emailview);
+            phoneview = findViewById(R.id.Numberview);
+            String name = nameview.getText().toString().trim();
+            int age = Integer.parseInt(ageview.getText().toString().trim());
+            String email = emailview.getText().toString();
+            Long pnum = Long.parseLong(phoneview.getText().toString());
+
+            new Thread(() -> {
+                AppDatabase database = getAppDatabase();
+
+                UserEntry existingUser = database.userDetailsDao().getUserDetails(1);
+                if (existingUser != null) {
+                    existingUser.setUname(name);
+                    existingUser.setAge(age);
+                    existingUser.setHeight(height);
+                    existingUser.setWeight(weight);
+                    existingUser.setEmail(email);
+                    existingUser.setPhoneNo(pnum);
+                    existingUser.setDate(new Date());
+
+                    database.userDetailsDao().update(existingUser);
+                } else {
+                    UserEntry newUser = new UserEntry(name, age, height, weight, email, pnum, new Date());
+                    database.userDetailsDao().insert(newUser);
+                }
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "User details submitted successfully", Toast.LENGTH_SHORT).show();
+                    clearFields();
+                });
+            }).start();
+        } else {
+            Toast.makeText(this, "Please enter your weight and height.", Toast.LENGTH_LONG).show();
+        }
+    }
+    private void calculateAndDisplayBMI() {
+
+        /*String weightStr = editTextWeight.getText().toString();
+        String heightStr = editTextHeight.getText().toString();
+
+        if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
+            float weight = Float.parseFloat(weightStr);
+            float height = Float.parseFloat(heightStr) / 100;
             float bmi = weight / (height * height);
 
             String bmiResultText = String.format(Locale.getDefault(), "Your BMI is: %.2f", bmi);
@@ -67,9 +115,47 @@ public class DetailsActivity extends AppCompatActivity {
             // Toast.makeText(this, bmiResultText, Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "Please enter your weight and height.", Toast.LENGTH_LONG).show();
-        }
+        }*/
+        new Thread(() -> {
+            AppDatabase database = getAppDatabase();
+            UserEntry userDetails = database.userDetailsDao().getUserDetails(1);
+
+            if (userDetails != null) {
+                float weight = userDetails.getWeight();
+                float height = userDetails.getHeight() / 100;
+
+                float bmi = weight / (height * height);
+
+                runOnUiThread(() -> {
+                    String bmiResultText = String.format(Locale.getDefault(), "Your BMI is: %.2f", bmi);
+                    textViewBmiResult.setText(bmiResultText);
+                    textViewBmiResult.setVisibility(View.VISIBLE);
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "User details not found", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+    private void clearFields() {
+        editTextWeight.setText("");
+        editTextHeight.setText("");
+        nameview.setText("");
+        ageview.setText("");
+        emailview.setText("");
+        phoneview.setText("");
+        textViewBmiResult.setText("");
+    }
+
+    private AppDatabase getAppDatabase() {
+        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
+                .fallbackToDestructiveMigration()
+                .build();
     }
 }
+
+
 
 
 

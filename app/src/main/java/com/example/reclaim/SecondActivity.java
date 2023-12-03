@@ -18,31 +18,31 @@ public class SecondActivity extends AppCompatActivity {
         Button button_health_advice= findViewById(R.id.useradvice);
         Button button_find_gym= findViewById(R.id.Gymfinder);
         Button button_progress= findViewById(R.id.progress);
-        findViewById(R.id.userdetails).setOnClickListener(view -> {
+        userdetailsButton.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, DetailsActivity.class);
             startActivity(intent);
             });
 
             // Button to track calories
-            findViewById(R.id.calorie_tracker).setOnClickListener(view -> {
+            button_track_calories.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, TrackCaloriesActivity.class);
             startActivity(intent);
             });
 
             // Button for health advice
-            findViewById(R.id.useradvice).setOnClickListener(view -> {
+            button_health_advice.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, HealthAdviceActivity.class);
             startActivity(intent);
             });
 
             // Button to find a gym
-            findViewById(R.id.Gymfinder).setOnClickListener(view -> {
+            button_find_gym.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, FindGymActivity.class);
             startActivity(intent);
             });
 
             // Button to view progress
-            findViewById(R.id.progress).setOnClickListener(view -> {
+            button_progress.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, ProgressActivity.class);
             startActivity(intent);
             });

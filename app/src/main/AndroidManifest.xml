@@ -39,6 +39,7 @@
         <activity android:name=".ProgressActivity"
             android:exported="true"/>
         <activity android:name=".ViewProgressActivity"/>
+        <activity android:name=".ViewDetailsActivity"/>
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBNdzUiEVlNllle5p7fbIMfqNMVq6K_xJI"/>
 
