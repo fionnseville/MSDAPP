@@ -8,48 +8,116 @@
     tools:context=".SecondActivity">
 
 
+    <ListView
+        android:id="@+id/CalorieList"
+        android:layout_width="151dp"
+        android:layout_height="479dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.876"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caloriesEditText" />
+
     <EditText
         android:id="@+id/foodEditText"
-        android:layout_width="392dp"
+        android:layout_width="0dp"
         android:layout_height="48dp"
         android:hint="Enter food item"
         android:inputType="textPersonName"
         android:padding="8dp"
         android:textColor="@color/white"
+        android:textColorHint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.578"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.101" />
+        app:layout_constraintVertical_bias="0.029" />
+
+    <EditText
+        android:id="@+id/caloriesEditText"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:hint="Enter calories"
+        android:inputType="number"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1" />
 
     <Button
         android:id="@+id/Addfoodbutton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="340dp"
+        android:layout_marginTop="48dp"
         android:backgroundTint="#3F51B5"
         android:padding="8dp"
         android:text="Add to List"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.811"
+        app:layout_constraintEnd_toStartOf="@+id/clearAllButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.883" />
+        app:layout_constraintTop_toBottomOf="@+id/FoodList" />
 
     <ListView
         android:id="@+id/FoodList"
-        android:layout_width="389dp"
-        android:layout_height="467dp"
+        android:layout_width="151dp"
+        android:layout_height="479dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:padding="4dp"
         android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.115"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caloriesEditText" />
+
+    <Button
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="#3F51B5"
+        android:text="Delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/clearAllButton"
+        app:layout_constraintTop_toBottomOf="@+id/CalorieList"
+        app:layout_constraintVertical_bias="0.083" />
+
+    <Button
+        android:id="@+id/clearAllButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="545dp"
+        android:backgroundTint="#3F51B5"
+        android:text="Clear All"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/caloriesEditText"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/dailycalories"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="507dp"
+        android:layout_marginBottom="19dp"
+        android:textColor="@color/white"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/clearAllButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/caloriesEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
