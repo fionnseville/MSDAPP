@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.tv.AdRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,16 +22,21 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +55,9 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     GoogleMap gMap;
     FrameLayout map;
 
+    Marker marker;
+    SearchView searchView;
+    Location currentlocation;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.find_gym_activity);
@@ -62,6 +71,44 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         setUpLocation();
         //Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
         map=findViewById(R.id.map);
+        searchView=findViewById(R.id.search);
+        searchView.clearFocus();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String loc =searchView.getQuery().toString();
+                if (loc ==null){
+                    Toast.makeText(FindGymActivity.this,"Location not found",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Geocoder geocoder =new Geocoder(FindGymActivity.this,Locale.getDefault());
+                    try{
+                        List<Address> addressList =geocoder.getFromLocationName(loc,1);
+                        if(addressList.size()>0){
+                            LatLng latLng =new LatLng(addressList.get(0).getLatitude(), addressList.get(0).getLongitude());
+                            if(marker != null){
+                                marker.remove();
+                            }
+                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(loc);
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng,5);
+                            gMap.animateCamera(cameraUpdate);
+                            marker =gMap.addMarker(markerOptions);
+
+                        }
+                    }catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
 
         SupportMapFragment mapFragment =( SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -89,7 +136,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
                 "Current Location: Latitude %1$s, Longitude %2$s",
                 location.getLatitude(), location.getLongitude());
         mLocationText.setText("GPS Location\n" + latestLocation);
-
+        currentlocation = location;
         if (gMap != null) {
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
             gMap.clear(); // Clear old markers
@@ -108,7 +155,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         }
         mLocationText.setText("GPS Location" + "\n" + latestLocation);  // updates the TextView with new location
 
-        fetchNearbyGyms(location.getLatitude(), location.getLongitude());
+        //etchNearbyGyms(location.getLatitude(), location.getLongitude());
         updateAddress(location);
 
 
@@ -131,13 +178,13 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         }
     }
 
-    private void fetchNearbyGyms(double latitude, double longitude) {
+    /*private void fetchNearbyGyms(double latitude, double longitude) {
         // Placeholder for fetching nearby gyms
         locationsList.clear();
         locationsList.add("Gym 1 at Location XYZ");
         locationsList.add("Gym 2 at Location ABC");
         locationsAdapter.notifyDataSetChanged();
-    }
+    }*/
 
     @Override  // displays toast is user doesnt grant permission
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -188,13 +235,31 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     }
 
 
-    @Override
+    /*@Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
         this.gMap =googleMap;
-        LatLng mapIreland =new LatLng(53,-6);
-        this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
-        this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
+        LatLng latLng = new LatLng(currentlocation.getLatitude(),currentlocation.getLongitude());
+        MarkerOptions markerOptions =new MarkerOptions().position(latLng).title("my current location");
+        googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
+        googleMap.addMarker((markerOptions));
+        //LatLng mapIreland =new LatLng(53,-6);
+        //this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
+        //this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
+    }*/
+    @Override
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        this.gMap = googleMap;
+        if (currentlocation != null) {
+            LatLng latLng = new LatLng(currentlocation.getLatitude(), currentlocation.getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title("my current location");
+            googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+            googleMap.addMarker(markerOptions);
+        } else {
+            Log.e("onMapReady", "currentLocation is null");
+        }
     }
 }
 
