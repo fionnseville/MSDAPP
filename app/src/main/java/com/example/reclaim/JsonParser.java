@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+//REFERENCE:  https://www.youtube.com/watch?v=pjFcJ6EB8Dg&ab_channel=AndroidCoding
+//for all places api and markers code
 public class JsonParser {
     private HashMap<String, String> parseJsonObject(JSONObject object) {
         HashMap<String, String> dataList = new HashMap<>();
@@ -60,3 +62,4 @@ public class JsonParser {
     }
 
 }
+//Reference complete +JSON file

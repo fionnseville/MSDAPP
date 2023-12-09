@@ -68,10 +68,14 @@ public class ViewProgressActivity extends AppCompatActivity {
         if (index >= 0 && index < photoEntries.size()) {
             ProgressEntry entry = photoEntries.get(index);
             if (entry.getPhoto() != null) {
+                //REFERENCE https://syntaxfix.com/question/18791/android-set-bitmap-to-imageview
                 Bitmap bitmap = BitmapFactory.decodeByteArray(entry.getPhoto(), 0, entry.getPhoto().length);
                 imageView.setImageBitmap(bitmap);
+                //reference complete
             }
+            //REFERENCE: https://stackoverflow.com/questions/18480633/java-util-date-format-conversion-yyyy-mm-dd-to-mm-dd-yyyy
             String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate());
+            //reference complete
             dateTextView.setText(formattedDate);
             descriptionTextView.setText(entry.getDescription());
         }

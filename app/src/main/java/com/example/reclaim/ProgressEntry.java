@@ -10,9 +10,10 @@ import java.util.Date;
 public class ProgressEntry {
     @PrimaryKey(autoGenerate = true)
     public int id;
-
+    //REFERENCE https://stackoverflow.com/questions/46337519/how-insert-image-in-room-persistence-library
     @ColumnInfo(name = "photo")
     public byte[] photo;
+    //reference complete
 
     @ColumnInfo(name = "description")
     public String description;

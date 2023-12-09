@@ -1,19 +1,13 @@
 package com.example.reclaim;
-
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
-
 import java.util.Date;
 import java.util.Locale;
 
@@ -89,33 +83,18 @@ public class DetailsActivity extends AppCompatActivity {
                     UserEntry newUser = new UserEntry(name, age, height, weight, email, pnum, new Date());
                     database.userDetailsDao().insert(newUser);
                 }
-
+                //https://androidexample.com/show-toast-message-inside-run-method-of-thread#:~:text=you%20are%20try%20to%20show,queue%20of%20the%20UI%20thread.
                 runOnUiThread(() -> {
                     Toast.makeText(this, "User details submitted successfully", Toast.LENGTH_SHORT).show();
                     clearFields();
                 });
+                //reference complete
             }).start();
         } else {
             Toast.makeText(this, "Please enter your weight and height.", Toast.LENGTH_LONG).show();
         }
     }
     private void calculateAndDisplayBMI() {
-
-        /*String weightStr = editTextWeight.getText().toString();
-        String heightStr = editTextHeight.getText().toString();
-
-        if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
-            float weight = Float.parseFloat(weightStr);
-            float height = Float.parseFloat(heightStr) / 100;
-            float bmi = weight / (height * height);
-
-            String bmiResultText = String.format(Locale.getDefault(), "Your BMI is: %.2f", bmi);
-            textViewBmiResult.setText(bmiResultText);
-            textViewBmiResult.setVisibility(View.VISIBLE);
-            // Toast.makeText(this, bmiResultText, Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Please enter your weight and height.", Toast.LENGTH_LONG).show();
-        }*/
         new Thread(() -> {
             AppDatabase database = getAppDatabase();
             UserEntry userDetails = database.userDetailsDao().getUserDetails(1);
@@ -147,12 +126,13 @@ public class DetailsActivity extends AppCompatActivity {
         phoneview.setText("");
         textViewBmiResult.setText("");
     }
-
+    //https://stackoverflow.com/questions/49629656/please-provide-a-migration-in-the-builder-or-call-fallbacktodestructivemigration
     private AppDatabase getAppDatabase() {
         return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
                 .fallbackToDestructiveMigration()
                 .build();
     }
+    //Reference complete
 }
 
 

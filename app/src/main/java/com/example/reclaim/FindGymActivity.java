@@ -71,6 +71,9 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     private String[] placeNameList;
     float currentLat, currentLng;
     SupportMapFragment mapFragment;
+    //REFERENCE:  https://www.youtube.com/watch?v=pjFcJ6EB8Dg&ab_channel=AndroidCoding
+    //for all places api and markers code
+    //REFERENCE for base googlemaps api fragment :https://www.youtube.com/watch?v=JzxjNNCYt_o&ab_channel=AndroidKnowledge
     FusedLocationProviderClient fusedLocationProviderClient;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +176,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
             @Override
             public void onClick(View v) {
                 int i =spType.getSelectedItemPosition();
-                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"+"?location="+currentLat+","+currentLng + "&radius=10000"+"&types="+ placeTypeList[i]+"&sensor=true" +"&key=" +getResources().getString(R.string.google_map_key2);
+                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"+"?location="+currentLat+","+currentLng + "&radius=100000"+"&types="+ placeTypeList[i]+"&sensor=true" +"&key=" +getResources().getString(R.string.google_map_key2);
                 //String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                 //        "?location=" + currentLat + "," + currentLng +
                 //        "&radius=5000" + "&types=" + placeTypeList[i] + "&key=" + getResources().getString(R.string.google_map_key);
@@ -205,15 +208,6 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
             e.printStackTrace();
         }
     }
-
-    private void fetchNearbyGyms(double latitude, double longitude) {
-        // Placeholder for fetching nearby gyms
-        locationsList.clear();
-        locationsList.add("Gym 1 at Location XYZ");
-        locationsList.add("Gym 2 at Location ABC");
-        locationsAdapter.notifyDataSetChanged();
-    }
-
     @Override  // displays toast is user doesnt grant permission
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -276,7 +270,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         //this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
         //this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
         gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLat,currentLng),10));
-    }
+    }//Reference Complete
 
     private class PlaceTask extends AsyncTask<String,Integer,String> {
         @Override
@@ -333,35 +327,27 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         @Override
         protected void onPostExecute(List<HashMap<String, String>> hashMaps) {
             super.onPostExecute(hashMaps);
-
             if (gMap != null) {
                 gMap.clear();
-
                 for (int i = 0; i < hashMaps.size(); i++) {
                     HashMap<String, String> hashMapList = hashMaps.get(i);
                     double lat = Double.parseDouble(hashMapList.get("lat"));
                     double lng = Double.parseDouble(hashMapList.get("lng"));
                     String name = hashMapList.get("name");
-
                     Log.d("ParserTask", "Marker: " + name + " (" + lat + ", " + lng + ")");
-
                     LatLng latLng = new LatLng(lat, lng);
                     MarkerOptions options = new MarkerOptions();
                     options.position(latLng);
                     options.title(name);
                     gMap.addMarker(options);
                 }
-
                 Log.d("ParserTask", "Markers added to the map");
             } else {
                 Log.e("ParserTask", "gMap is null");
             }
         }
     }
-
-
-
-    }
+}//Reference complete +JSON file
 
 
 

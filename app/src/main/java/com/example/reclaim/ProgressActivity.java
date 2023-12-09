@@ -44,19 +44,14 @@ public class ProgressActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.progress_activity);
-
         imageViewPhoto = findViewById(R.id.imageViewPhoto);
         editTextPhotoDescription = findViewById(R.id.editTextPhotoDescription);
         buttonCapturePhoto = findViewById(R.id.buttonCapturePhoto);
-
         buttonCapturePhoto.setOnClickListener(view -> dispatchTakePictureIntent());
         buttonNextPhoto = findViewById(R.id.buttonNextPhoto);
-
         buttonSubmit = findViewById(R.id.buttonSubmit);
         buttonSubmit.setOnClickListener(view -> submitEntry());
-
         buttonNextPhoto.setOnClickListener(view -> openViewProgressActivity());
-
         loadPhotosFromDatabase();
 }
 
@@ -99,7 +94,7 @@ public class ProgressActivity extends AppCompatActivity {
             photoEntries = getAppDatabase().progressEntryDao().getAllEntries();
         }).start();
     }
-
+    //Reference :https://alitalhacoban.medium.com/use-phone-camera-in-android-studio-c6066159f642
     private void dispatchTakePictureIntent() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, REQUEST_PERMISSION_CAMERA);
@@ -138,11 +133,12 @@ public class ProgressActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageViewPhoto.setImageBitmap(imageBitmap);
-
+            //REFERENCE https://stackoverflow.com/questions/8417034/how-to-make-bitmap-compress-without-change-the-bitmap-size
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             currentPhoto = stream.toByteArray();
             currentDescription = editTextPhotoDescription.getText().toString();
+            //reference complete
         }
     }
 
@@ -157,7 +153,7 @@ public class ProgressActivity extends AppCompatActivity {
                 //add toast later on****
             }
         }
-    }
+    }//reference complete
 
     private AppDatabase getAppDatabase() {
         return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
