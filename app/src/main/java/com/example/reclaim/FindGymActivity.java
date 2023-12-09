@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,14 +26,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,26 +62,69 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     private ListView locationsListView;
     private ArrayAdapter<String> locationsAdapter;
     private ArrayList<String> locationsList = new ArrayList<>();
+    //Location location;
     GoogleMap gMap;
     FrameLayout map;
+    Spinner spType;
+    Button btFind;
+    private String[] placeTypeList;
+    private String[] placeNameList;
+    float currentLat, currentLng;
+    SupportMapFragment mapFragment;
+    FusedLocationProviderClient fusedLocationProviderClient;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.find_gym_activity);
+        spType = findViewById(R.id.sp_type);
+        btFind = findViewById(R.id.bt_find);
+        //placeTypeList = new String[]{"atm", "bank", "hospital"};
+        //placeNameList = new String[]{"ATM", "Bank", "Hospital"};
+        placeTypeList = new String[]{"gym", "park"};
+        placeNameList = new String[]{"Gym", "Park"};
+        spType.setAdapter(new ArrayAdapter<>(FindGymActivity.this, android.R.layout.simple_spinner_dropdown_item, placeNameList));
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(FindGymActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            getCurrentLocation();
+        } else {
+            ActivityCompat.requestPermissions(FindGymActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
+        }
         mLocationText = (TextView) findViewById(R.id.location);   // initialises the text view using its id from xml
         locality = (TextView) findViewById(R.id.locality);// initialises locality with a text view from xml
-        locationsListView = (ListView) findViewById(R.id.locations_list);
+        //locationsListView = (ListView) findViewById(R.id.locations_list);
         //locationsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationsList);
         //locationsListView.setAdapter(locationsAdapter);
         locationsAdapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.textViewItem, locationsList);
-        locationsListView.setAdapter(locationsAdapter);
+        //locationsListView.setAdapter(locationsAdapter);
         setUpLocation();
         //Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
-        map=findViewById(R.id.map);
+        map = findViewById(R.id.map);
 
-        SupportMapFragment mapFragment =( SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
+    private void getCurrentLocation() {
+        Task<Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location !=null){
+                    currentLat =Math.round(location.getLatitude());
+                    currentLng =Math.round(location.getLongitude());
+                    mapFragment.getMapAsync((new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(@NonNull GoogleMap googleMap) {
+                            gMap= googleMap;
+                            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLat,currentLng),10));
+                        }
+                    }));
+                }
+            }
+        });
+
+    }
+
 
     private void setUpLocation()
     {
@@ -105,10 +164,26 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
                     "Current Location: Latitude %1$s Longitude : %2$s",
                     Math.round(location.getLatitude()), Math.round(location.getLongitude()));
             Log.d("GPSLOCATION", "Location formatted for TextView!");
-        }
+
+
+        }/*else{
+            ActivityCompat.requestPermissions(FindGymActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},44);
+        }*/
+        btFind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int i =spType.getSelectedItemPosition();
+                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"+"?location="+currentLat+","+currentLng + "&radius=10000"+"&types="+ placeTypeList[i]+"&sensor=true" +"&key=" +getResources().getString(R.string.google_map_key2);
+                //String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
+                //        "?location=" + currentLat + "," + currentLng +
+                //        "&radius=5000" + "&types=" + placeTypeList[i] + "&key=" + getResources().getString(R.string.google_map_key);
+
+                new PlaceTask().execute(url);
+            }
+        });
         mLocationText.setText("GPS Location" + "\n" + latestLocation);  // updates the TextView with new location
 
-        fetchNearbyGyms(location.getLatitude(), location.getLongitude());
+        //fetchNearbyGyms(location.getLatitude(), location.getLongitude());
         updateAddress(location);
 
 
@@ -142,6 +217,11 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     @Override  // displays toast is user doesnt grant permission
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode ==44){
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                getCurrentLocation();
+            }
+        }
         switch (requestCode) {
             case MY_PERMISSION_GPS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -192,9 +272,96 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
         this.gMap =googleMap;
-        LatLng mapIreland =new LatLng(53,-6);
-        this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
-        this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
+        //LatLng mapIreland =new LatLng(53,-6);
+        //this.gMap.addMarker(new MarkerOptions().position(mapIreland).title("marker in ireland"));
+        //this.gMap.moveCamera(CameraUpdateFactory.newLatLng(mapIreland));
+        gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLat,currentLng),10));
     }
-}
+
+    private class PlaceTask extends AsyncTask<String,Integer,String> {
+        @Override
+        protected String doInBackground(String...strings){
+            String data =null;
+            try {
+                data = downloadUrl(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return data;
+        }
+        /*@Override
+        protected void onPostExecute(String s){
+            new ParserTask().execute(s);
+        }*/
+        @Override
+        protected void onPostExecute(String s) {
+                new ParserTask().execute(s);
+        }
+        private String downloadUrl(String string) throws IOException{
+            URL url= new URL(string);
+            HttpURLConnection connection =(HttpURLConnection) url.openConnection();
+            connection.connect();
+            InputStream stream =connection.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder builder =new StringBuilder();
+            String line ="";
+            while ((line = reader.readLine()) !=null){
+                builder.append(line);
+            }
+            String data = builder.toString();
+            reader.close();
+            return data;
+        }
+
+    }
+
+    private class ParserTask extends AsyncTask<String, Integer, List<HashMap<String, String>>> {
+        @Override
+        protected List<HashMap<String, String>> doInBackground(String... strings) {
+            JsonParser jsonParser = new JsonParser();
+            List<HashMap<String, String>> mapList = null;
+            JSONObject object = null;
+            try {
+                object = new JSONObject(strings[0]);
+                mapList = jsonParser.parseResult(object);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return mapList;
+        }
+
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> hashMaps) {
+            super.onPostExecute(hashMaps);
+
+            if (gMap != null) {
+                gMap.clear();
+
+                for (int i = 0; i < hashMaps.size(); i++) {
+                    HashMap<String, String> hashMapList = hashMaps.get(i);
+                    double lat = Double.parseDouble(hashMapList.get("lat"));
+                    double lng = Double.parseDouble(hashMapList.get("lng"));
+                    String name = hashMapList.get("name");
+
+                    Log.d("ParserTask", "Marker: " + name + " (" + lat + ", " + lng + ")");
+
+                    LatLng latLng = new LatLng(lat, lng);
+                    MarkerOptions options = new MarkerOptions();
+                    options.position(latLng);
+                    options.title(name);
+                    gMap.addMarker(options);
+                }
+
+                Log.d("ParserTask", "Markers added to the map");
+            } else {
+                Log.e("ParserTask", "gMap is null");
+            }
+        }
+    }
+
+
+
+    }
+
+
 

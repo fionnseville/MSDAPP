@@ -5,4 +5,6 @@
     <string name="photo">Photo</string>
     <string name="date">Date</string>
     <string name="description">Description</string>
+    <string name="google_map_key">AIzaSyBNdzUiEVlNllle5p7fbIMfqNMVq6K_xJI</string>
+    <string name="google_map_key2">AIzaSyAG4EMkERLHnJMrO72RJI8AeKy2tpdj2Io</string>
 </resources>
