@@ -1,0 +1,22 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/calorie_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/fire_noback"
+        android:scaleX="2.1"
+        android:scaleY="2.1"/>
+    <TextView
+        android:id="@+id/textViewCalorieItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:padding="8dp"
+        android:textSize="20sp"
+        android:textAlignment="center"/>
+</LinearLayout>

@@ -30,12 +30,11 @@
         android:padding="8dp"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/caloriesEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.029" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/caloriesEditText"
@@ -58,14 +57,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="544dp"
         android:backgroundTint="#3F51B5"
         android:padding="8dp"
         android:text="Add to List"
         android:textColor="@color/white"
         app:layout_constraintEnd_toStartOf="@+id/clearAllButton"
+        app:layout_constraintHorizontal_bias="0.552"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/FoodList" />
+        app:layout_constraintTop_toBottomOf="@+id/caloriesEditText" />
 
     <ListView
         android:id="@+id/FoodList"

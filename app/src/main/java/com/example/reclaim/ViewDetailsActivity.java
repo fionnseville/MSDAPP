@@ -49,8 +49,6 @@ public class ViewDetailsActivity extends AppCompatActivity {
 
     }
     private AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
-                .fallbackToDestructiveMigration()
-                .build();
+        return AppDatabase.getInstance(getApplicationContext());
     }
 }

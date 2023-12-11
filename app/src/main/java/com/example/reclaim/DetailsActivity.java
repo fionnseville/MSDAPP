@@ -126,13 +126,9 @@ public class DetailsActivity extends AppCompatActivity {
         phoneview.setText("");
         textViewBmiResult.setText("");
     }
-    //https://stackoverflow.com/questions/49629656/please-provide-a-migration-in-the-builder-or-call-fallbacktodestructivemigration
     private AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
-                .fallbackToDestructiveMigration()
-                .build();
+        return AppDatabase.getInstance(getApplicationContext());
     }
-    //Reference complete
 }
 
 

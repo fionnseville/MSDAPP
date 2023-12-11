@@ -21,9 +21,9 @@ public class TrackCaloriesActivity extends AppCompatActivity {
     private TextView  dailycaloriesTextView ;
     private List<String> foodListItems;
     private ArrayAdapter<String> foodAdapter;
-
     private List<String> calorieListItems;
     private ArrayAdapter<String> calorieAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,16 +31,17 @@ public class TrackCaloriesActivity extends AppCompatActivity {
         dailycaloriesTextView = findViewById(R.id.dailycalories);
         editTextFoodItem = findViewById(R.id.foodEditText);
         AddFood = findViewById(R.id.Addfoodbutton);
-
         ListView calorieListView = findViewById(R.id.CalorieList);
         calorieListItems = new ArrayList<>();
-        calorieAdapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.textViewItem, calorieListItems);
+        calorieAdapter = new CustomList2Adapter(this, calorieListItems);
+        //calorieAdapter = new ArrayAdapter<>(this, R.layout.custom_list_2, R.id.textViewItem, calorieListItems);
         calorieListView.setAdapter(calorieAdapter);
         calorieListItems.add("Calories:");
         calculateDailyCalorieIntake();
         ListView foodListView = findViewById(R.id.FoodList);
         foodListItems = new ArrayList<>();
-        foodAdapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.textViewItem, foodListItems);
+        foodAdapter = new CustomList1Adapter(this, foodListItems);
+        //foodAdapter = new ArrayAdapter<>(this, R.layout.custom_list_item, R.id.textViewItem, foodListItems);
         foodListView.setAdapter(foodAdapter);
         foodListItems.add("Food:");
         AddFood.setOnClickListener(v -> {
@@ -77,6 +78,7 @@ public class TrackCaloriesActivity extends AppCompatActivity {
             });
         }).start();
     }
+
     private void updateLists() {
         new Thread(() -> {
             AppDatabase database = getAppDatabase();
@@ -165,9 +167,7 @@ public class TrackCaloriesActivity extends AppCompatActivity {
     }
 
     private AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
-                .fallbackToDestructiveMigration()
-                .build();
+        return AppDatabase.getInstance(getApplicationContext());
     }
 }
 

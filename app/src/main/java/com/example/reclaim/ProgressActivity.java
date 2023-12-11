@@ -156,8 +156,6 @@ public class ProgressActivity extends AppCompatActivity {
     }//reference complete
 
     private AppDatabase getAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "reclaim-database")
-                .fallbackToDestructiveMigration()
-                .build();
+        return AppDatabase.getInstance(getApplicationContext());
     }
 }
