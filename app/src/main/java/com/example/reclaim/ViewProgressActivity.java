@@ -22,6 +22,7 @@ public class ViewProgressActivity extends AppCompatActivity {
     private ImageView imageView;
     private TextView dateTextView;
     private TextView descriptionTextView;
+    private AppDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,50 +35,52 @@ public class ViewProgressActivity extends AppCompatActivity {
         Button buttonPrevious = findViewById(R.id.previousButton);
         Button buttonNext = findViewById(R.id.nextButton);
 
-        loadAllEntries();
+        loadAllEntries();//loads all entries from database
 
         buttonPrevious.setOnClickListener(v -> {
-            if (currentIndex > 0) {
-                currentIndex--;
-                displayEntry(currentIndex);
+            if (currentIndex > 0) {//checks if there is a previous entry
+                currentIndex--;//decrements
+                displayEntry(currentIndex);//dispalys entry
             }
         });
 
         buttonNext.setOnClickListener(v -> {
-            if (currentIndex < photoEntries.size() - 1) {
-                currentIndex++;
-                displayEntry(currentIndex);
+            if (currentIndex < photoEntries.size() - 1) {//check if there is a next entry
+                currentIndex++;//Increments
+                displayEntry(currentIndex);//displays entry
             }
         });
     }
 
     private void loadAllEntries() {
         new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                    AppDatabase.class, "reclaim-database").build();
-            photoEntries = db.progressEntryDao().getAllEntries();
+            photoEntries = database.progressEntryDao().getAllEntries();
             runOnUiThread(() -> {
                 if (!photoEntries.isEmpty()) {
-                    displayEntry(0);
+                    displayEntry(0);//displays first entry brought on intent if empty
                 }
             });
         }).start();
     }
 
     private void displayEntry(int index) {
-        if (index >= 0 && index < photoEntries.size()) {
-            ProgressEntry entry = photoEntries.get(index);
+        if (index >= 0 && index < photoEntries.size()) {//checks if index is valid
+            ProgressEntry entry = photoEntries.get(index);//gets entry from list
             if (entry.getPhoto() != null) {
                 //REFERENCE https://syntaxfix.com/question/18791/android-set-bitmap-to-imageview
+                //converts byte array to bitmap and displays in imageview
                 Bitmap bitmap = BitmapFactory.decodeByteArray(entry.getPhoto(), 0, entry.getPhoto().length);
                 imageView.setImageBitmap(bitmap);
                 //reference complete
             }
             //REFERENCE: https://stackoverflow.com/questions/18480633/java-util-date-format-conversion-yyyy-mm-dd-to-mm-dd-yyyy
-            String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate());
+            String formattedDate = new SimpleDateFormat("yyyy-MM-dd").format(entry.getDate());//formats date
             //reference complete
             dateTextView.setText(formattedDate);
             descriptionTextView.setText(entry.getDescription());
         }
+    }
+    private AppDatabase getAppDatabase() {
+        return AppDatabase.getInstance(getApplicationContext());
     }
 }

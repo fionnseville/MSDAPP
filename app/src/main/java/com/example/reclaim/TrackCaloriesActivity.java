@@ -23,11 +23,14 @@ public class TrackCaloriesActivity extends AppCompatActivity {
     private ArrayAdapter<String> foodAdapter;
     private List<String> calorieListItems;
     private ArrayAdapter<String> calorieAdapter;
+    private AppDatabase database;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.track_calories_activity);
+        database = getAppDatabase();
         dailycaloriesTextView = findViewById(R.id.dailycalories);
         editTextFoodItem = findViewById(R.id.foodEditText);
         AddFood = findViewById(R.id.Addfoodbutton);
@@ -35,14 +38,14 @@ public class TrackCaloriesActivity extends AppCompatActivity {
         calorieListItems = new ArrayList<>();
         calorieAdapter = new CustomList2Adapter(this, calorieListItems);
         //calorieAdapter = new ArrayAdapter<>(this, R.layout.custom_list_2, R.id.textViewItem, calorieListItems);
-        calorieListView.setAdapter(calorieAdapter);
-        calorieListItems.add("Calories:");
-        calculateDailyCalorieIntake();
+        calorieListView.setAdapter(calorieAdapter);//setting for listview
+        calorieListItems.add("Calories:");//basically just a header
+        calculateDailyCalorieIntake();//gets users weight and height calculates the daily cals
         ListView foodListView = findViewById(R.id.FoodList);
         foodListItems = new ArrayList<>();
         foodAdapter = new CustomList1Adapter(this, foodListItems);
         //foodAdapter = new ArrayAdapter<>(this, R.layout.custom_list_item, R.id.textViewItem, foodListItems);
-        foodListView.setAdapter(foodAdapter);
+        foodListView.setAdapter(foodAdapter);//setting for listview
         foodListItems.add("Food:");
         AddFood.setOnClickListener(v -> {
             String foodItem = editTextFoodItem.getText().toString();
@@ -65,15 +68,15 @@ public class TrackCaloriesActivity extends AppCompatActivity {
             calculateDailyCalorieIntake();
         });
 
+        //retrieves previous inputs and displays in listview
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
             List<CalorieTrackerEntry> entries = database.calorieTrackerDao().getAllEntries();
             runOnUiThread(() -> {
                 for (CalorieTrackerEntry entry : entries) {
                     foodListItems.add(entry.getFoodName());
                     calorieListItems.add(entry.getCalories() + "");
                 }
-                foodAdapter.notifyDataSetChanged();
+                foodAdapter.notifyDataSetChanged();//updating adapter
                 calorieAdapter.notifyDataSetChanged();
             });
         }).start();
@@ -81,20 +84,19 @@ public class TrackCaloriesActivity extends AppCompatActivity {
 
     private void updateLists() {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
             List<CalorieTrackerEntry> entries = database.calorieTrackerDao().getAllEntries();
 
             runOnUiThread(() -> {
-                foodListItems.clear();
+                foodListItems.clear();//clears items displayed so it doesnt duplicate entries
                 calorieListItems.clear();
-                foodListItems.add("Food:");
+                foodListItems.add("Food:");//adding the header again
                 calorieListItems.add("Calories:");
                 for (CalorieTrackerEntry entry : entries) {
                     foodListItems.add(entry.getFoodName());
                     calorieListItems.add("" + entry.getCalories());
                 }
 
-                foodAdapter.notifyDataSetChanged();
+                foodAdapter.notifyDataSetChanged();//updates the adapter
                 calorieAdapter.notifyDataSetChanged();
             });
         }).start();
@@ -102,20 +104,18 @@ public class TrackCaloriesActivity extends AppCompatActivity {
 
     private void submitFooditem() {
         food_name = findViewById(R.id.foodEditText);
-        String fname = food_name.getText().toString().trim();
+        String fname = food_name.getText().toString().trim();//getting food name
         calorie_num = findViewById(R.id.caloriesEditText);
-        int calories = Integer.parseInt(calorie_num.getText().toString().trim());
+        int calories = Integer.parseInt(calorie_num.getText().toString().trim());//getting calories
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
-
-            CalorieTrackerEntry newEntry = new CalorieTrackerEntry(fname, calories);
+            CalorieTrackerEntry newEntry = new CalorieTrackerEntry(fname, calories);//adding to the database
             database.calorieTrackerDao().insert(newEntry);
             updateLists();
-            calculateDailyCalorieIntake();
+            calculateDailyCalorieIntake();//updates calories needed
 
             runOnUiThread(() -> {
                 Toast.makeText(this, " food added successfully", Toast.LENGTH_SHORT).show();
-                clearFields();
+                clearFields();//clears the input fields
             });
         }).start();
 
@@ -123,9 +123,8 @@ public class TrackCaloriesActivity extends AppCompatActivity {
 
     private void deleteLatestEntry() {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
             List<CalorieTrackerEntry> entries = database.calorieTrackerDao().getAllEntries();
-
+            //checks that theres an entry and then deletes the most recent
             if (!entries.isEmpty()) {
                 CalorieTrackerEntry latestEntry = entries.get(entries.size() - 1);
                 database.calorieTrackerDao().delete(latestEntry);
@@ -135,15 +134,14 @@ public class TrackCaloriesActivity extends AppCompatActivity {
 
     private void calculateDailyCalorieIntake() {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
             UserEntry user = database.userDetailsDao().getUserDetails(1);
             if (user != null) {
-                float weight = user.getWeight();
-                float height = user.getHeight();
+                float weight = user.getWeight();//gets users weight
+                float height = user.getHeight();//gets height
                 int age = user.getAge();
-                int basalMetabolicRate = (int) (66 + (13.7 * weight) + (5 * height) - (6.8 * age));
-                int totalCaloriesConsumed = database.calorieTrackerDao().getTotalCalories();
-                int dailyCalorieIntake = basalMetabolicRate - totalCaloriesConsumed;
+                int basalMetabolicRate = (int) (66 + (13.7 * weight) + (5 * height) - (6.8 * age));//calculation for cals
+                int totalCaloriesConsumed = database.calorieTrackerDao().getTotalCalories();//total calories added to list
+                int dailyCalorieIntake = basalMetabolicRate - totalCaloriesConsumed;//takes the cals off daily total
 
                 runOnUiThread(() -> {
                     dailycaloriesTextView.setText("Daily Calorie Intake left: " + dailyCalorieIntake);
@@ -153,8 +151,7 @@ public class TrackCaloriesActivity extends AppCompatActivity {
     }
     private void clearAllEntries() {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
-            database.calorieTrackerDao().deleteAllEntries();
+            database.calorieTrackerDao().deleteAllEntries();//deletes all entries from database
         }).start();
     }
 

@@ -13,6 +13,7 @@ public class HealthAdviceActivity extends AppCompatActivity {
 
     private TextView textViewHealthFact;
     private Button buttonShowNextFact;
+    //random facts
     private String[] healthFacts = {
             "Quitting smoking reduces your risk of heart attack by 40%",
             "Drinking water boosts your metabolism",
@@ -56,7 +57,7 @@ public class HealthAdviceActivity extends AppCompatActivity {
     }
 
     private void showRandomHealthFact() {
-        int randomIndex = random.nextInt(healthFacts.length);
-        textViewHealthFact.setText(healthFacts[randomIndex]);
+        int randomIndex = random.nextInt(healthFacts.length);//sets random int within index size
+        textViewHealthFact.setText(healthFacts[randomIndex]);//sets the fact in textview
     }
 }

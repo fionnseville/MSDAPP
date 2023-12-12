@@ -96,32 +96,36 @@ public class ProgressActivity extends AppCompatActivity {
     }
     //Reference :https://alitalhacoban.medium.com/use-phone-camera-in-android-studio-c6066159f642
     private void dispatchTakePictureIntent() {
+        //checks permiissions for camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, REQUEST_PERMISSION_CAMERA);
         } else {
-            openCamera();
+            openCamera();//opens camera if allowed
         }
     }
 
     private void openCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);//creates intent to take a picture
         try {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);//starts acticity
         } catch (ActivityNotFoundException e) {
-            // Handle the exception
+            //handle the exception
         }
     }
     private void openViewProgressActivity() {
-        if (!photoEntries.isEmpty()) {
-            ProgressEntry currentEntry = photoEntries.get(currentPhotoIndex);
+        // Opens the activity to view progress entries
 
-            Intent intent = new Intent(this, ViewProgressActivity.class);
+        if (!photoEntries.isEmpty()) {//checks if there is an entry
+            ProgressEntry currentEntry = photoEntries.get(currentPhotoIndex);//gets current entry
+
+            Intent intent = new Intent(this, ViewProgressActivity.class);//new intent
+            //putting extra data in the intent
             intent.putExtra("image", currentEntry.getPhoto());
             intent.putExtra("date", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(currentEntry.getDate()));
             intent.putExtra("description", currentEntry.getDescription());
             startActivity(intent);
 
-            currentPhotoIndex = (currentPhotoIndex + 1) % photoEntries.size();
+            currentPhotoIndex = (currentPhotoIndex + 1) % photoEntries.size();//updates for next entry
         }
     }
 
@@ -131,24 +135,24 @@ public class ProgressActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageViewPhoto.setImageBitmap(imageBitmap);
+            Bitmap imageBitmap = (Bitmap) extras.get("data");//gets captured image
+            imageViewPhoto.setImageBitmap(imageBitmap);//sets image to imageview
             //REFERENCE https://stackoverflow.com/questions/8417034/how-to-make-bitmap-compress-without-change-the-bitmap-size
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             currentPhoto = stream.toByteArray();
-            currentDescription = editTextPhotoDescription.getText().toString();
+            currentDescription = editTextPhotoDescription.getText().toString();//gets the description from the user
             //reference complete
         }
     }
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,String[] permissions,int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
+                openCamera();//open camera if permission is granted
             } else {
                 //add toast later on****
             }

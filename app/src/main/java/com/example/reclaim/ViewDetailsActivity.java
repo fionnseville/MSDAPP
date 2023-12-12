@@ -7,13 +7,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 public class ViewDetailsActivity extends AppCompatActivity {
+    private AppDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.viewdetails);
+        database = getAppDatabase();
         loadAndDisplayUserDetails(1);
 
         Button returnbutton=findViewById(R.id.returnButton);
@@ -24,9 +26,9 @@ public class ViewDetailsActivity extends AppCompatActivity {
     }
    private void loadAndDisplayUserDetails(int userId) {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
+            //gets user details using user id =1
             UserEntry userDetails = database.userDetailsDao().getUserDetails(userId);
-            if (userDetails != null) {
+            if (userDetails != null) {//checks if null
                 runOnUiThread(() -> {
                     TextView textViewName = findViewById(R.id.textViewName);
                     TextView textViewAge = findViewById(R.id.textViewAge);
@@ -34,6 +36,7 @@ public class ViewDetailsActivity extends AppCompatActivity {
                     TextView textViewWeight = findViewById(R.id.textViewWeight);
                     TextView textViewEmail = findViewById(R.id.textViewEmail);
                     TextView textViewPhone = findViewById(R.id.textViewPhone);
+                    //sets users details for the textviews
                     textViewName.setText("Name: " + userDetails.getUname());
                     textViewAge.setText("Age: " + userDetails.getAge());
                     textViewHeight.setText("Height: " + userDetails.getHeight());

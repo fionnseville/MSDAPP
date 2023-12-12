@@ -17,13 +17,15 @@ public class DetailsActivity extends AppCompatActivity {
     Button bmiButton;
     Button viewDetailsButton;
     Button Submit;
+    private AppDatabase database;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.details_activity);
-
+        database = getAppDatabase();
         Button returnbutton=findViewById(R.id.returnbutton);
         returnbutton.setOnClickListener(view -> {
             Intent intent = new Intent(DetailsActivity.this, SecondActivity.class);
@@ -50,6 +52,7 @@ public class DetailsActivity extends AppCompatActivity {
         });
     }
     private void submitUserDetails() {
+        //gets values from edit texts
         String weightStr = editTextWeight.getText().toString();
         String heightStr = editTextHeight.getText().toString();
 
@@ -60,16 +63,16 @@ public class DetailsActivity extends AppCompatActivity {
             ageview = findViewById(R.id.ageview);
             emailview = findViewById(R.id.emailview);
             phoneview = findViewById(R.id.Numberview);
+            //gets values for others
             String name = nameview.getText().toString().trim();
             int age = Integer.parseInt(ageview.getText().toString().trim());
             String email = emailview.getText().toString();
             Long pnum = Long.parseLong(phoneview.getText().toString());
 
             new Thread(() -> {
-                AppDatabase database = getAppDatabase();
-
                 UserEntry existingUser = database.userDetailsDao().getUserDetails(1);
                 if (existingUser != null) {
+                    //updates the users details if there not null
                     existingUser.setUname(name);
                     existingUser.setAge(age);
                     existingUser.setHeight(height);
@@ -80,6 +83,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                     database.userDetailsDao().update(existingUser);
                 } else {
+                    //if no user details adds values
                     UserEntry newUser = new UserEntry(name, age, height, weight, email, pnum, new Date());
                     database.userDetailsDao().insert(newUser);
                 }
@@ -96,9 +100,8 @@ public class DetailsActivity extends AppCompatActivity {
     }
     private void calculateAndDisplayBMI() {
         new Thread(() -> {
-            AppDatabase database = getAppDatabase();
             UserEntry userDetails = database.userDetailsDao().getUserDetails(1);
-
+            //checks if user details are availible
             if (userDetails != null) {
                 float weight = userDetails.getWeight();
                 float height = userDetails.getHeight() / 100;
@@ -106,6 +109,7 @@ public class DetailsActivity extends AppCompatActivity {
                 float bmi = weight / (height * height);
 
                 runOnUiThread(() -> {
+                    //displays bmi in textview
                     String bmiResultText = String.format(Locale.getDefault(), "Your BMI is: %.2f", bmi);
                     textViewBmiResult.setText(bmiResultText);
                     textViewBmiResult.setVisibility(View.VISIBLE);
@@ -118,6 +122,7 @@ public class DetailsActivity extends AppCompatActivity {
         }).start();
     }
     private void clearFields() {
+        //empties edittexts
         editTextWeight.setText("");
         editTextHeight.setText("");
         nameview.setText("");

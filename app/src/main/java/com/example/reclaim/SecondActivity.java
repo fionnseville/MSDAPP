@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,10 @@ public class SecondActivity extends AppCompatActivity {
         Button button_health_advice= findViewById(R.id.useradvice);
         Button button_find_gym= findViewById(R.id.Gymfinder);
         Button button_progress= findViewById(R.id.progress);
+        String username = getIntent().getStringExtra("username");
+        if (username != null && !username.isEmpty()) {
+            Toast.makeText(this, "Goodbye " + username+"See you soon", Toast.LENGTH_SHORT).show(); // displays goodbye message to the user with their name passed from previous intent
+        }
         userdetailsButton.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, DetailsActivity.class);
             startActivity(intent);

@@ -83,12 +83,12 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         btFind = findViewById(R.id.bt_find);
         //placeTypeList = new String[]{"atm", "bank", "hospital"};
         //placeNameList = new String[]{"ATM", "Bank", "Hospital"};
-        placeTypeList = new String[]{"gym", "park"};
-        placeNameList = new String[]{"Gym", "Park"};
+        placeTypeList = new String[]{"gym", "park"};//types for places api search
+        placeNameList = new String[]{"Gym", "Park"};//name of places
         spType.setAdapter(new ArrayAdapter<>(FindGymActivity.this, android.R.layout.simple_spinner_dropdown_item, placeNameList));
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);//location service setup needed for apo
         if (ActivityCompat.checkSelfPermission(FindGymActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            getCurrentLocation();
+            getCurrentLocation();//get location if given permission
         } else {
             ActivityCompat.requestPermissions(FindGymActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 44);
         }
@@ -99,13 +99,15 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         //locationsListView.setAdapter(locationsAdapter);
         locationsAdapter = new ArrayAdapter<>(this, R.layout.list_item, R.id.textViewItem, locationsList);
         //locationsListView.setAdapter(locationsAdapter);
-        setUpLocation();
+        setUpLocation();//called for gps updates
         //Toast.makeText(FindGymActivity.this, "Values Updated: Time = " + minTime + ", Distance = " + minDistance, Toast.LENGTH_SHORT).show();
         map = findViewById(R.id.map);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);//gets the map fragment
     }
+    // Method to get the current location using FusedLocationProviderClient
+
 
     private void getCurrentLocation() {
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
@@ -115,11 +117,13 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
                 if(location !=null){
                     currentLat =Math.round(location.getLatitude());
                     currentLng =Math.round(location.getLongitude());
+                    // Update map with current location
+
                     mapFragment.getMapAsync((new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(@NonNull GoogleMap googleMap) {
                             gMap= googleMap;
-                            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLat,currentLng),10));
+                            gMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLat,currentLng),1));
                         }
                     }));
                 }
@@ -147,6 +151,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
 
     @Override
     public void onLocationChanged(Location location) {
+        //updates the ui with the lat and long
         String latestLocation = String.format(
                 "Current Location: Latitude %1$s, Longitude %2$s",
                 location.getLatitude(), location.getLongitude());
@@ -156,7 +161,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
             LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
             gMap.clear(); // Clear old markers
             gMap.addMarker(new MarkerOptions().position(currentLocation).title("Current Location"));
-            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15)); // Zoom level is adjustable
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 2)); // Zoom level
         }
         //String latestLocation = "";
 
@@ -175,19 +180,21 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         btFind.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //constructing url for google places api
                 int i =spType.getSelectedItemPosition();
                 String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"+"?location="+currentLat+","+currentLng + "&radius=100000"+"&types="+ placeTypeList[i]+"&sensor=true" +"&key=" +getResources().getString(R.string.google_map_key2);
                 //String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                 //        "?location=" + currentLat + "," + currentLng +
                 //        "&radius=5000" + "&types=" + placeTypeList[i] + "&key=" + getResources().getString(R.string.google_map_key);
-
+                //executes async for api call
                 new PlaceTask().execute(url);
             }
         });
         mLocationText.setText("GPS Location" + "\n" + latestLocation);  // updates the TextView with new location
 
         //fetchNearbyGyms(location.getLatitude(), location.getLongitude());
-        updateAddress(location);
+        updateAddress(location);// Update address based on current location
+
 
 
     }
@@ -277,6 +284,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
         protected String doInBackground(String...strings){
             String data =null;
             try {
+                // Download data from the URL
                 data = downloadUrl(strings[0]);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -292,7 +300,7 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
                 new ParserTask().execute(s);
         }
         private String downloadUrl(String string) throws IOException{
-            URL url= new URL(string);
+            URL url= new URL(string);// Convert the string to URL
             HttpURLConnection connection =(HttpURLConnection) url.openConnection();
             connection.connect();
             InputStream stream =connection.getInputStream();
@@ -300,11 +308,11 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
             StringBuilder builder =new StringBuilder();
             String line ="";
             while ((line = reader.readLine()) !=null){
-                builder.append(line);
+                builder.append(line);  // Read data line by line and append
             }
             String data = builder.toString();
             reader.close();
-            return data;
+            return data;//return the fetched data
         }
 
     }
@@ -331,15 +339,15 @@ public class FindGymActivity extends AppCompatActivity implements LocationListen
                 gMap.clear();
                 for (int i = 0; i < hashMaps.size(); i++) {
                     HashMap<String, String> hashMapList = hashMaps.get(i);
-                    double lat = Double.parseDouble(hashMapList.get("lat"));
-                    double lng = Double.parseDouble(hashMapList.get("lng"));
-                    String name = hashMapList.get("name");
+                    double lat = Double.parseDouble(hashMapList.get("lat"));//get latitude
+                    double lng = Double.parseDouble(hashMapList.get("lng"));//get longitude
+                    String name = hashMapList.get("name");//name of location
                     Log.d("ParserTask", "Marker: " + name + " (" + lat + ", " + lng + ")");
-                    LatLng latLng = new LatLng(lat, lng);
+                    LatLng latLng = new LatLng(lat, lng);//gets location
                     MarkerOptions options = new MarkerOptions();
                     options.position(latLng);
                     options.title(name);
-                    gMap.addMarker(options);
+                    gMap.addMarker(options);//adds markers to the map
                 }
                 Log.d("ParserTask", "Markers added to the map");
             } else {

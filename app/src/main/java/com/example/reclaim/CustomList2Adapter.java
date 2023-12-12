@@ -18,10 +18,10 @@ public class CustomList2Adapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // Checks if an existing view is being used
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_list_2, parent, false);
         }
-
         TextView textViewCalorie = convertView.findViewById(R.id.textViewCalorieItem);
         textViewCalorie.setText(getItem(position));
 
