@@ -20,7 +20,7 @@ public class CustomList1Adapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Checks if an existing view is being used
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_list_item, parent);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_list_item, parent,false);
         }
         TextView textViewFood = convertView.findViewById(R.id.textViewFoodItem);
         textViewFood.setText(getItem(position));

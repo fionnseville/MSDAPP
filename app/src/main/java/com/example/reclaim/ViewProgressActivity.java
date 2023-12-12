@@ -28,7 +28,7 @@ public class ViewProgressActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress_activity);
-
+        database = getAppDatabase();
         imageView = findViewById(R.id.viewImageView);
         dateTextView = findViewById(R.id.viewDateText);
         descriptionTextView = findViewById(R.id.viewDescriptionText);

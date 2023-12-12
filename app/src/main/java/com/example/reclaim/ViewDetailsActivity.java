@@ -17,10 +17,14 @@ public class ViewDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.viewdetails);
         database = getAppDatabase();
         loadAndDisplayUserDetails(1);
-
+        String username = getIntent().getStringExtra("username");
+        if (username != null && !username.isEmpty()) {
+            Toast.makeText(this, "Hello " + username + " these are your details", Toast.LENGTH_SHORT).show(); //display the welcome message
+        }
         Button returnbutton=findViewById(R.id.returnButton);
         returnbutton.setOnClickListener(view -> {
-            Intent intent = new Intent(ViewDetailsActivity.this, DetailsActivity.class);
+            Intent intent = new Intent(ViewDetailsActivity.this, SecondActivity.class);
+            intent.putExtra("username", username); //pass name
             startActivity(intent);
         });
     }

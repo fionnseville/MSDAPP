@@ -21,7 +21,7 @@ public class SecondActivity extends AppCompatActivity {
         Button button_progress= findViewById(R.id.progress);
         String username = getIntent().getStringExtra("username");
         if (username != null && !username.isEmpty()) {
-            Toast.makeText(this, "Goodbye " + username+"See you soon", Toast.LENGTH_SHORT).show(); // displays goodbye message to the user with their name passed from previous intent
+            Toast.makeText(this, "Goodbye " + username+" See you soon", Toast.LENGTH_SHORT).show(); // displays goodbye message to the user with their name passed from previous intent
         }
         userdetailsButton.setOnClickListener(view -> {
             Intent intent = new Intent(SecondActivity.this, DetailsActivity.class);

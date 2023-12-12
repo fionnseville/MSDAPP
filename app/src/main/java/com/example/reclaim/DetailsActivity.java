@@ -26,12 +26,17 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.details_activity);
         database = getAppDatabase();
+        loadUserDetails();
         Button returnbutton=findViewById(R.id.returnbutton);
         returnbutton.setOnClickListener(view -> {
             Intent intent = new Intent(DetailsActivity.this, SecondActivity.class);
             startActivity(intent);
         });
 
+        nameview = findViewById(R.id.Nameview);
+        ageview = findViewById(R.id.ageview);
+        emailview = findViewById(R.id.emailview);
+        phoneview = findViewById(R.id.Numberview);
         Submit =findViewById(R.id.buttonSubmit);
         Submit.setOnClickListener(view -> submitUserDetails());
         editTextWeight = findViewById(R.id.weightview);
@@ -41,6 +46,8 @@ public class DetailsActivity extends AppCompatActivity {
         viewDetailsButton = findViewById(R.id.viewdetailsbutton);
         viewDetailsButton.setOnClickListener(view -> {
             Intent intent = new Intent(DetailsActivity.this, ViewDetailsActivity.class);
+            String name = nameview.getText().toString().trim(); // Get the username from the editText
+            intent.putExtra("username", name); //pass name 
             startActivity(intent);
         });
         //viewDetailsButton.setOnClickListener(view -> loadAndDisplayUserDetails(1));
@@ -117,6 +124,22 @@ public class DetailsActivity extends AppCompatActivity {
             } else {
                 runOnUiThread(() -> {
                     Toast.makeText(this, "User details not found", Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
+    }
+    private void loadUserDetails() {
+        new Thread(() -> {
+            UserEntry userDetails = database.userDetailsDao().getUserDetails(1);
+            if (userDetails != null) {
+                runOnUiThread(() -> {
+                    // sets current details in edittext
+                    nameview.setText(userDetails.getUname());
+                    ageview.setText(String.valueOf(userDetails.getAge()));
+                    editTextHeight.setText(String.valueOf(userDetails.getHeight()));
+                    editTextWeight.setText(String.valueOf(userDetails.getWeight()));
+                    emailview.setText(userDetails.getEmail());
+                    phoneview.setText(String.valueOf(userDetails.getPhoneNo()));
                 });
             }
         }).start();
